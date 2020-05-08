@@ -1,20 +1,20 @@
+import os
+
 import pygame
 
 from Plansza.Constant import *
 
 
-def podniesPionek():
+def podniesPionek(pole, *mouse):
     pass
 
 
-def draw(x, y, pole, screen):
-    if pole == FLD_WHITE:
-        pionek = pygame.image.load("images\\pionekBialy.png")
-    elif pole == FLD_BLACK:
-        pionek = pygame.image.load("images\\pionekCzarny.png")
-    if pionek.get_alpha is None:
-        pionek = pionek.convert()
+def draw(x, y, screen, name):
+    osImage = os.path.join('images', name)
+    image = pygame.image.load(osImage)
+    if image.get_alpha is None:
+        image = image.convert()
     else:
-        pionek = pionek.convert_alpha()
-    pionek = pygame.transform.scale(pionek, (FLD, FLD))
-    screen.blit(pionek, (x, y))
+        image = image.convert_alpha()
+    image = pygame.transform.scale(image, (FLD, FLD))
+    screen.blit(image, (x, y))

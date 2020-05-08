@@ -2,13 +2,14 @@ import os
 import pygame
 from email import message
 
+import Funkcje
 from Plansza.Pole import Pole
 from Plansza.Constant import *
 
 
 class Szachownica:
     def __init__(self):
-        self._field = [[Pole(i,j, FLD_EMPTY) for i in range(8)] for j in range(8)]
+        self._field = [[Pole(j,i, FLD_EMPTY) for i in range(8)] for j in range(8)]
         self.setList()
 
     def setList(self):
@@ -23,17 +24,26 @@ class Szachownica:
                 y = 7 - j
                 self._field[x][y].setNaPolu(FLD_WHITE)
 
+    def getCurrentField(self, i, j):
+        return self._field[i][j]
+
     def getPole(self, i, j):
         return self._field[i][j].getNaPolu()
 
-    def naPionku(self, mouse):
-        for pole in self._field:
-            x, y = pole.getPos()
-            if mouse[0] > x and x + FLD > mouse[0] and mouse [1] > y and y + FLD > mouse[1]:
-                return True, pole
-            return False
+    def naPionku(self, *mouse, screen):
+        for raw in self._field:
+            for pole in raw:
+                x, y = pole.getPos()
+                if pole.getNaPolu() != FLD_EMPTY and x < mouse[0] < x + FLD and y < mouse [1] < y + FLD:
+                    Funkcje.draw(x, y, screen, 'podswietlenie.png')
+                    return pole
+        return
 
+    def setRuchy(self, i, j):
+        pass
 
+    def getRuchy(self):
+        pass
 
 
 

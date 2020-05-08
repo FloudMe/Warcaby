@@ -12,6 +12,8 @@ class Pole:
         self._posX = self._indexX*FLD
         self._posY = self._indexY*FLD
         self._naPolu = naPolu
+        self._ruchy = dict()
+        self._iloscRuchow = 0
 
     def getIndex(self):
         return self._indexX, self._indexY
@@ -25,4 +27,9 @@ class Pole:
     def setNaPolu(self, naPolu):
         self._naPolu = naPolu
 
+    def setRuchy(self):
+        pass
 
+
+    def getRuchy(self):
+        pass
