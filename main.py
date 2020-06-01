@@ -1,63 +1,61 @@
+import os
 import sys
 import pygame
 
-from Funkcje import *
+from Funkcje import drawPionki, ustawPionek
+from Komunikat import komunikatOPrzegranej, turaGracza
 from Plansza import Szachownica
-from Plansza.Constant import *
+from Plansza.Constant import FLD_ALL, ROZMIAR_CZCIONKI
+
+from Podswietlenie import podswietlenie
 
 pygame.init()
 
-windowSize = (FLD_ALL, FLD_ALL)
+windowSize = (FLD_ALL, FLD_ALL + ROZMIAR_CZCIONKI)
 
 screen = pygame.display.set_mode(windowSize)
 
 clock = pygame.time.Clock()
-szachownica = Szachownica.Szachownica()
-turn = 0
-
-osGlownaPlansza = os.path.join('images', 'szachownica.png')
-imageGlownaPlansza = pygame.image.load(osGlownaPlansza)
-
-podswietlonePole = None
 
 while 1:
 
-    clock.tick(30)
+    szachownica = Szachownica.Szachownica()
+    turn = 0
 
-    screen.blit(imageGlownaPlansza, (0, 0))
+    osGlownaPlansza = os.path.join('images', 'szachownica.png')
+    imageGlownaPlansza = pygame.image.load(osGlownaPlansza)
 
-    mousePosition = pygame.mouse.get_pos()
+    podswietlonePole = None
 
-    for i in range(8):
-        for j in range(8):
-            naPolu = szachownica.getPole(i, j)
-            if naPolu != FLD_EMPTY:
-                if naPolu == FLD_WHITE:
-                    name = 'pionekBialy.png'
-                elif naPolu == FLD_BLACK:
-                    name = 'pionekCzarny.png'
-                x, y = szachownica.getCurrentField(i, j).getPos()
-                draw(x, y, screen, name)
-                szachownica.setRuchy(i, j)
+    run = True
 
-    if mousePosition[0] != -1 and not pygame.mouse.get_pressed()[0]:
-        podswietlonePole = szachownica.naPionku(mousePosition[0], mousePosition[1], screen=screen, turn=turn)  # podswitlenie pionka
+    while run:
 
-    if pygame.mouse.get_pressed()[0] and podswietlonePole:
-        if podswietlonePole.getIloscRuchow() > 0 and szachownica.getIloscBicNaPlanszy()[turn] == 0 or podswietlonePole.getIloscBic() > 0:
-            podniesPionek(podswietlonePole, screen, szachownica, turn, mousePosition[0], mousePosition[1]) #podniesienie pionka
+        clock.tick(30)
 
-    iloscRuchow = szachownica.getIloscRuchowNaPlanszy()
+        screen.blit(imageGlownaPlansza, (0, 0))
 
-    if iloscRuchow[turn] > 0:
-        pass
+        mousePosition = pygame.mouse.get_pos()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONUP and podswietlonePole:
-            turn = ustawPionek(podswietlonePole, szachownica, turn, mousePosition[0], mousePosition[1])
-            podswietlonePole.setTemp() #ustawianie na swoje miejsce zmienionego pola
+        podswietlonePole = podswietlenie(screen, szachownica, turn, mousePosition[0], mousePosition[1])
 
-    pygame.display.update()
+        drawPionki(szachownica, screen, turn)
+
+        iloscRuchow = szachownica.getIloscRuchowNaPlanszy()
+        iloscBic = szachownica.getIloscBicNaPlanszy()
+
+        if iloscRuchow[turn] + iloscBic[turn] < 1:
+            if komunikatOPrzegranej(turn, screen, mousePosition[0], mousePosition[1]) == True:
+                run = False
+        else:
+            turaGracza(turn, screen)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONUP and podswietlonePole:
+                turn = ustawPionek(podswietlonePole, szachownica, turn, mousePosition[0], mousePosition[1])
+                podswietlonePole.posX, podswietlonePole.posY = podswietlonePole.tempPosX, podswietlonePole.tempPosY #ustawianie na swoje miejsce zmienionego pola
+
+        pygame.display.update()
 
